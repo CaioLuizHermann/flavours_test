@@ -1,5 +1,8 @@
 import pygame
 from pathlib import Path
+from screens.menu import MenuScreen
+from screens.game import GameScreen
+
 pygame.init()
 info = pygame.display.Info()
 WIDTH = info.current_w
@@ -10,23 +13,25 @@ pygame.display.set_caption("Meu Jogo")
 script_dir = Path(__file__).parent
 clock = pygame.time.Clock()
 
+menu_screen = MenuScreen(WIDTH, HEIGHT, script_dir)
+game_screen = GameScreen(WIDTH, HEIGHT)
+
+current_screen = "menu"
 running = True
+
 while running:
     clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                running = False
-    screen.fill((255, 229, 204))
-    start_btn_w = 350
-    start_btn_h = 100
-    start_btn_x = WIDTH/2 - start_btn_w/2
-    start_btn_y = HEIGHT/2 - start_btn_h/2 + 150
-    start_btn = pygame.image.load(script_dir/"start_btn.png")
-    start_btn.blit(screen, (start_btn_x, start_btn_y))
-
+        if current_screen == "menu":
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+    if current_screen == "menu":
+        menu_screen.update()
+        menu_screen.draw(screen)
+    elif current_screen == "game":
+        game_screen.draw(screen)
     pygame.display.flip()
-
 pygame.quit()
