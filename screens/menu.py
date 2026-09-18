@@ -19,6 +19,9 @@ class MenuScreen:
             if event.button == 1:
                 if self.start_btn_rect.collidepoint(mouse_pos):
                     return "game"
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                return "quit"
         return None
 
     def update(self):

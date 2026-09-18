@@ -24,14 +24,21 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if current_screen == "menu":
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
+    if current_screen == "menu":
+        result = menu_screen.handle_event(event)
+        if result == "game":
+            current_screen = "game"
+        elif result == "quit":
+            pygame.quit()
+    elif current_screen == "game":
+        result = game_screen.handle_event(event)
+        if result == "menu":
+            current_screen = "menu"
     if current_screen == "menu":
         menu_screen.update()
         menu_screen.draw(screen)
     elif current_screen == "game":
         game_screen.draw(screen)
+        game_screen.update()
     pygame.display.flip()
 pygame.quit()
