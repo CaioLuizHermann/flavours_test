@@ -21,6 +21,7 @@ running = True
 
 while running:
     clock.tick(FPS)
+    fps_counter += 1
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -40,5 +41,8 @@ while running:
     elif current_screen == "game":
         game_screen.draw(screen)
         game_screen.update()
+    if fps_counter % 60 == 0 and current_screen == "game":
+        game_screen.text = game_screen.text - 1
+    
     pygame.display.flip()
 pygame.quit()

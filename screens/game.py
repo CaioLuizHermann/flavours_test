@@ -4,6 +4,10 @@ class GameScreen:
         self.width = width
         self.height = height
 
+        self.text = 10
+        font = pygame.font.Font("Arial", 20)
+        return font
+
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
