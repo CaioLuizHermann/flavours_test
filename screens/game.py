@@ -3,9 +3,11 @@ from PIL import Image
 import PIL
 import random
 class GameScreen:
-    def __init__(self, width, height, script_dir):
+    def __init__(self, width, height, script_dir, music):
+        self.music = music
         self.screen_n = 0
         self.points = 0
+        self.coin_extended_active = True
         self.texts = [
     "*Walks through the front door*",
     "What a long day.",
@@ -56,19 +58,24 @@ class GameScreen:
         ]
         self.question_n = (23, 25, 27, 29, 31, 33, 36)
         self.marina = False
+        self.script_dir = script_dir
+        self.points_sfx = pygame.mixer.Sound(self.script_dir / "assets/points_sfx.wav")
+        self.points_sfx.set_volume(0.45)
+        pygame.mixer.set_reserved(1)
+        self.channel_points = pygame.mixer.Channel(0)
         self.displayed_points = 0
         self.counter_points = 0
         self.points_delay = 5
         self.wrong_active = False
         self.correct_answers = {23: 1, 25: 0, 27: 0, 29: 3, 31: 2, 33: 1, 36: 0}
         self.wrong_answer = "Darn it, let's try again!"
-        self.script_dir = script_dir
         self.slime_active = False
         self.font_clock = pygame.font.Font(None, 70)
         self.font_mouse = pygame.font.Font(None, 30)
         self.font_speech = pygame.font.Font(script_dir / "assets/deltarune.ttf", 40)
         self.current_text_str = self.texts[0]
         self.type_speed = 0.5
+        self.counter_delay_points = 0
         self.script_dir = script_dir
         self.width = width
         self.debug_mode = False
@@ -91,7 +98,7 @@ class GameScreen:
         self.frames_question = []
         self.answer_selected = 0
         self.marina_human = pygame.image.load(script_dir / "assets/marina_human.png")
-        self.marina_human = pygame.transform.scale(self.marina_human, (self.marina_human.get_width()*2, self.marina_human.get_height()*2))
+        self.marina_human = pygame.transform.scale(self.marina_human, (self.marina_human.get_width()*1.2, self.marina_human.get_height()*1.2))
         self.slime = Image.open(script_dir / "assets/slime.gif")
         self.clock = Image.open(script_dir / "assets/clock.gif")
         self.background = Image.open(script_dir / "assets/background_game.gif")
@@ -101,7 +108,7 @@ class GameScreen:
         self.num_frames_clock = self.clock.n_frames
         self.num_frames_background = self.background.n_frames
         self.num_frames_txtbox = self.txt_box.n_frames
-        self.slime_screens = [11,13,14,16,18,19,21,22,37,39,40,41,43]
+        self.slime_screens = [11,13,14,16,18,19,21,22,37,39,40,41,44]
         self.player_screens = [0,1,2,3,4,5,6,8,10,12,15,17,20,38,42]
         self.unknown_screens = [7,9]
         self.typed_chars = 0.0
@@ -274,8 +281,18 @@ class GameScreen:
         if self.question_active and not self.wrong_active and self.counter <= 0:
             self.go_to(self.screen_n + 2)
         if self.screen_n == len(self.texts) -1:
-            if self.displayed_points < self.points:
-                self.displayed_points += 100
+            if self.displayed_points <= self.points:
+                self.counter_delay_points +=1
+                if self.counter_delay_points >= 3:
+                    self.counter_delay_points = 0  
+                    if self.displayed_points < self.points:
+                        self.displayed_points += int(self.points // 1000)
+                    if self.points_sfx and not pygame.Channel.get_busy(self.channel_points):
+                        if self.displayed_points == self.points and self.coin_extended_active == True:
+                            self.channel_points.play(self.points_sfx, loops= 0,maxtime= 3000)
+                            self.coin_extended_active = False
+                        else:
+                            self.channel_points.play(self.points_sfx, loops= 0, maxtime = 100)
             self.texts[self.screen_n] = f"Final Points: {self.displayed_points}"
             self.current_text_str = f"Final Points: {self.displayed_points}"
             self.typed_chars = len(self.current_text_str)
@@ -343,6 +360,12 @@ class GameScreen:
         self.typed_chars = 0.0
         self.answer_selected = 0
         self.wrong_active = False
+        self.coin_extended_active = True
+        self.points = 0
+        self.displayed_points = 0
+        self.counter_delay_points = 0
+        self.marina = False
+        self.go_to(0)
 
     def get_current_screen(self):
         return self.screen_n
@@ -378,6 +401,17 @@ class GameScreen:
             self.displayed_points = 0
         self.talking()
         self.load_textbox()
+        self.update_music()
     def next_screen(self):
         if self.screen_n + 1 < len(self.texts):
             self.go_to(self.screen_n + 1)
+def update_music(self):
+    n = self.screen_n
+    if n < self.question_n[0]:
+        self.music.play("intro")
+    elif n <= self.question_n[-1] + 1:      # perguntas + feedback da última
+        self.music.play("quiz")
+    elif n < len(self.texts) - 1:
+        self.music.play("after")
+    else:
+        self.music.play("score", loops=0)   # loops=-1 se quiser repetir

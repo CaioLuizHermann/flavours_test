@@ -17,13 +17,18 @@ script_dir = Path(__file__).parent
 clock = pygame.time.Clock()
 
 menu_screen = MenuScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, script_dir)
-game_screen = GameScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, script_dir)
+from music import Music
+music = Music(script_dir)
+game_screen = GameScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, script_dir, music)
 virtual_screen = pygame.Surface((VIRTUAL_WIDTH, VIRTUAL_HEIGHT))
 current_screen_n = ""
 current_screen = "menu"
 running = True
 
 fps_counter = 0
+from music import Music
+music = Music(script_dir)
+music.play("menu")
 
 while running:
     clock.tick(FPS)
@@ -43,6 +48,7 @@ while running:
             result = game_screen.handle_event(event)
             if result == "menu":
                 current_screen = "menu"
+                music.play("menu")
                 continue
     if current_screen == "menu":
         menu_screen.update()
