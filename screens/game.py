@@ -291,7 +291,7 @@ class GameScreen:
                         if self.displayed_points == self.points and self.coin_extended_active == True:
                             self.channel_points.play(self.points_sfx, loops= 0,maxtime= 3000)
                             self.coin_extended_active = False
-                        else:
+                        elif self.displayed_points < self.points:
                             self.channel_points.play(self.points_sfx, loops= 0, maxtime = 100)
             self.texts[self.screen_n] = f"Final Points: {self.displayed_points}"
             self.current_text_str = f"Final Points: {self.displayed_points}"
@@ -390,6 +390,16 @@ class GameScreen:
             self.typed_chars = 0.0
             self.talking()
             self.load_textbox()
+    def update_music(self):
+        n = self.screen_n
+        if n < self.question_n[0]:
+            self.music.play("intro")
+        elif n <= self.question_n[-1] + 1:
+            self.music.play("quiz")
+        elif n <= 44:
+            self.music.play("after")
+        else:
+            self.music.play("score", loops=-1)
     def go_to(self, n):
         self.screen_n = n
         self.typed_chars = 0.0
@@ -405,13 +415,3 @@ class GameScreen:
     def next_screen(self):
         if self.screen_n + 1 < len(self.texts):
             self.go_to(self.screen_n + 1)
-def update_music(self):
-    n = self.screen_n
-    if n < self.question_n[0]:
-        self.music.play("intro")
-    elif n <= self.question_n[-1] + 1:      # perguntas + feedback da última
-        self.music.play("quiz")
-    elif n < len(self.texts) - 1:
-        self.music.play("after")
-    else:
-        self.music.play("score", loops=0)   # loops=-1 se quiser repetir
