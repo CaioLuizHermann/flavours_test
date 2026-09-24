@@ -61,7 +61,7 @@ while running:
     if fps_counter % 60 == 0 and current_screen == "game":
         if game_screen.counter <= 0:
             pass
-        else:
+        elif game_screen.typed_chars >= len(game_screen.current_text_str) and game_screen.counter > 0:
             game_screen.counter = game_screen.counter - 1
     expanded = pygame.transform.scale(virtual_screen, (WIDTH, HEIGHT))
     screen.blit(expanded, (0, 0))

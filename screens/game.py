@@ -30,9 +30,9 @@ class GameScreen:
     "The scientist left behind an English assignment. He said if all the questions are answered correctly, we will gain the antidote.",
     "*Wobbles toward the papers on the desk* These papers... they're the assignment. Will you help me, please?",
     "*Sits down at the desk* Of course I will. Let's get you back to normal.",
-    "*Bounces happily, leaving a tiny trail of goo* Thank you! Let's start right away!",
+    "*Bounces happily, leaving a tiny trail of goo* Thank you! Let me start right away!",
     "*Hops onto the desk, papers rustling beneath her* Alright! Let's begin with question one.",
-    "\"Which of these words describes the sea-scent the best?\" a) Pungent b) Briny c) Salty d) Earthy",
+    "\"Which of these words best describes the sea-scent?\" a) Pungent b) Briny c) Salty d) Earthy",
     "*Bounces excitedly* Correct! \"Briny\" is magnificent for describing that salty ocean scent!",
     "Question two! \"Which of these flavors is tangy most similar to?\" a) Sour b) Salty c) Sickly Sweet d) Umami",
     "*Wiggles happily* Yes! Tangy and sour go hand in hand.",
@@ -42,10 +42,10 @@ class GameScreen:
     "Yes, that's correct!",
     "Question five! \"Which of these can be considered earthy?\" a) French fries and a burger b) A mop and a broom c) Mushrooms and tubers d) Pasta with ground beef",
     "*Smiles in approval* Wonderful! You're really getting the hang of this!",
-    "Question six! \"What does 'couch potato' mean?\" a) A potato sitting in the couch b) A person that lies down on the couch all day c) Kids that like couches and potatoes d) None of the options",
-    "That's it! You're really getting the hang of this!",
-    "*Takes a deep, nervous breath* This is it... the last question",
-    "What is the correct scale of \"crunchiness\" from more crunchy to less crunchy? a) Crunchy, Crispy, Flaky b) Crispy, Snowflaky, Crunchy, Oyster c) Crunchy, Flaky, Radiant, Crispy d) Crunchy, Crispy, Flaky, Smiley",
+    "Question six! \"What does 'couch potato' mean?\" a) A potato sitting on the couch b) A person who lies down on the couch all day c) Kids who like couches and potatoes d) None of the options",
+    "That's it! You're doing great!",
+    "*Takes a deep, nervous breath* This is it... the last question.",
+    "What is the correct scale of \"crunchiness\" from most crunchy to least crunchy? a) Crunchy, Crispy, Flaky b) Crispy, Snowflaky, Crunchy, Oyster c) Crunchy, Flaky, Radiant, Crispy d) Crunchy, Crispy, Flaky, Smiley",
     "That's... that's correct!!",
     "The antidote... it's ready!",
     "*Shields eyes as the vial begins to fizz and glow faintly* Marina?! Are you okay?!",
@@ -55,7 +55,7 @@ class GameScreen:
     "*Stunned* You're... you're really you again.",
     "*Smiles warmly, eyes glistening* Thanks to you. I don't know how to repay this.",
     "Final Points: "
-        ]
+]
         self.question_n = (23, 25, 27, 29, 31, 33, 36)
         self.marina = False
         self.script_dir = script_dir
@@ -336,7 +336,7 @@ class GameScreen:
         lines = []
         present_line = ""
         for word in words:
-            if len(present_line + word) < 47:
+            if len(present_line + word) < 54:
                 present_line += word + " "
             else:
                 lines.append(present_line)
@@ -346,8 +346,13 @@ class GameScreen:
         for i, line in enumerate(lines):
             if remaining <= 0:
                 break
-            line_render = self.font_speech.render(line[:remaining], True, color=(255, 255, 255))
-            y = 340 + (i * 50)
+            if remaining >= len(line):
+                line_render = self.font_speech.render(line, True, color=(255, 255, 255))
+                remaining -= len(line)  # SUBTRAI aqui!
+            else:
+                line_render = self.font_speech.render(line[:remaining], True, color=(255, 255, 255))
+                remaining = 0  # Não tem mais pra desenhar
+            y = 340 + (i * 35)
             screen.blit(line_render, (20, y))
 
     def reset(self):

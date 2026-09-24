@@ -35,6 +35,8 @@ class MenuScreen:
         self.title_rect.center = (width/2, (height/2) * 0.6)
         self.titlebox_rect.center = self.title_rect.center
     def handle_event(self, event):
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            return "game"
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 if self.start_btn_rect.collidepoint(self.mouse_pos_virtual):
