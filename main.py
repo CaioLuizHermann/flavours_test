@@ -26,13 +26,10 @@ current_screen = "menu"
 running = True
 
 fps_counter = 0
-from music import Music
-music = Music(script_dir)
 music.play("menu")
 
 while running:
-    clock.tick(FPS)
-    fps_counter += 1
+    dt = clock.tick(FPS) / 1000
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -56,13 +53,8 @@ while running:
     elif current_screen == "game":
 
         game_screen.draw(virtual_screen)
-        game_screen.update()
+        game_screen.update(dt)
         game_screen.draw_text(virtual_screen)
-    if fps_counter % 60 == 0 and current_screen == "game":
-        if game_screen.counter <= 0:
-            pass
-        elif game_screen.typed_chars >= len(game_screen.current_text_str) and game_screen.counter > 0:
-            game_screen.counter = game_screen.counter - 1
     expanded = pygame.transform.scale(virtual_screen, (WIDTH, HEIGHT))
     screen.blit(expanded, (0, 0))
     pygame.display.flip()

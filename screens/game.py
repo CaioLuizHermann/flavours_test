@@ -1,71 +1,97 @@
 import pygame
 from PIL import Image
 import PIL
-import random
 class GameScreen:
     def __init__(self, width, height, script_dir, music):
         self.music = music
+        self.time_accum = 0.0
         self.screen_n = 0
         self.points = 0
         self.coin_extended_active = True
-        self.texts = [
-    "*Walks through the front door*",
-    "What a long day.",
-    "*Drags feet toward the bedroom*",
-    "*Closes the door behind him*",
-    "*Freezes* ...Wait. Something's moving on my desk.",
-    "*Steps closer, squinting* Are those... my papers? Why are they shuffling on their own?",
-    "And what is that blob?",
-    "*Wobbles nervously* O-oh! You're home! Please don't scream!",
-    "*Jumps back* You talked! You're a slime?!",
-    "*Bounces slightly* I know this looks strange, but it's me. Marina.",
-    "Marina? My English teacher, Marina?",
-    "*Drips a little from embarrassment* The one and only. Or... what's left of her.",
-    "What happened to you and why are you in my house?!",
-    "*Shrinks a bit* A mad scientist ambushed me after class yesterday.",
-    "He said I was \"the perfect test subject\" and turned me into this slime.",
-    "That's insane. There has to be a way to reverse it, right?",
-    "*Perks up, bouncing hopefully* There is! But I need your help.",
-    "My help? What can I do?",
-    "The scientist left behind an English assignment. He said if all the questions are answered correctly, we will gain the antidote.",
-    "*Wobbles toward the papers on the desk* These papers... they're the assignment. Will you help me, please?",
-    "*Sits down at the desk* Of course I will. Let's get you back to normal.",
-    "*Bounces happily, leaving a tiny trail of goo* Thank you! Let me start right away!",
-    "*Hops onto the desk, papers rustling beneath her* Alright! Let's begin with question one.",
-    "\"Which of these words best describes the sea-scent?\" a) Pungent b) Briny c) Salty d) Earthy",
-    "*Bounces excitedly* Correct! \"Briny\" is magnificent for describing that salty ocean scent!",
-    "Question two! \"Which of these flavors is tangy most similar to?\" a) Sour b) Salty c) Sickly Sweet d) Umami",
-    "*Wiggles happily* Yes! Tangy and sour go hand in hand.",
-    "Question three! \"Which of these is flaky?\" a) Croissant b) Pão de Queijo c) Pepperoni Pizza d) A Wooden Plank",
-    "Exactly! Croissants are definitely flaky!",
-    "Question four! \"Which of these has a pungent odor?\" a) A Snowflake b) A Raw Potato c) Lasagna d) Gorgonzola Cheese",
-    "Yes, that's correct!",
-    "Question five! \"Which of these can be considered earthy?\" a) French fries and a burger b) A mop and a broom c) Mushrooms and tubers d) Pasta with ground beef",
-    "*Smiles in approval* Wonderful! You're really getting the hang of this!",
-    "Question six! \"What does 'couch potato' mean?\" a) A potato sitting on the couch b) A person who lies down on the couch all day c) Kids who like couches and potatoes d) None of the options",
-    "That's it! You're doing great!",
-    "*Takes a deep, nervous breath* This is it... the last question.",
-    "What is the correct scale of \"crunchiness\" from most crunchy to least crunchy? a) Crunchy, Crispy, Flaky b) Crispy, Snowflaky, Crunchy, Oyster c) Crunchy, Flaky, Radiant, Crispy d) Crunchy, Crispy, Flaky, Smiley",
-    "That's... that's correct!!",
-    "The antidote... it's ready!",
-    "*Shields eyes as the vial begins to fizz and glow faintly* Marina?! Are you okay?!",
-    "*Voice slightly muffled as she absorbs the liquid* I'm fine! Just... hold on!",
-    "*The glow fades, revealing her human form once more* ...I— I'm back.",
-    "*Looks down at her own hands, flexing her fingers* Hands. Actual hands!",
-    "*Stunned* You're... you're really you again.",
-    "*Smiles warmly, eyes glistening* Thanks to you. I don't know how to repay this.",
-    "Final Points: "
-]
+        self.intro = [
+            {"speaker": "player",  "text": "*Walks through the front door*"},
+            {"speaker": "player",  "text": "What a long day."},
+            {"speaker": "player",  "text": "*Drags feet toward the bedroom*"},
+            {"speaker": "player",  "text": "*Closes the door behind him*"},
+            {"speaker": "player",  "text": "*Freezes* ...Wait. Something's moving on my desk."},
+            {"speaker": "player",  "text": "*Steps closer, squinting* Are those... my papers? Why are they shuffling on their own?"},
+            {"speaker": "player",  "text": "And what is that blob?"},
+            {"speaker": "unknown", "text": "*Wobbles nervously* O-oh! You're home! Please don't scream!"},
+            {"speaker": "player",  "text": "*Jumps back* You talked! You're a slime?!"},
+            {"speaker": "unknown", "text": "*Bounces slightly* I know this looks strange, but it's me. Marina."},
+            {"speaker": "player",  "text": "Marina? My English teacher, Marina?"},
+            {"speaker": "slime",   "text": "*Drips a little from embarrassment* The one and only. Or... what's left of her."},
+            {"speaker": "player",  "text": "What happened to you and why are you in my house?!"},
+            {"speaker": "slime",   "text": "*Shrinks a bit* A mad scientist ambushed me after class yesterday."},
+            {"speaker": "slime",   "text": "He said I was \"the perfect test subject\" and turned me into this slime."},
+            {"speaker": "player",  "text": "That's insane. There has to be a way to reverse it, right?"},
+            {"speaker": "slime",   "text": "*Perks up, bouncing hopefully* There is! But I need your help."},
+            {"speaker": "player",  "text": "My help? What can I do?"},
+            {"speaker": "slime",   "text": "The scientist left behind an English assignment. He said if all the questions are answered correctly, we will gain the antidote."},
+            {"speaker": "slime",   "text": "*Wobbles toward the papers on the desk* These papers... they're the assignment. Will you help me, please?"},
+            {"speaker": "player",  "text": "*Sits down at the desk* Of course I will. Let's get you back to normal."},
+            {"speaker": "slime",   "text": "*Bounces happily, leaving a tiny trail of goo* Thank you! Let me start right away!"},
+            {"speaker": "slime",   "text": "*Hops onto the desk, papers rustling beneath her* Alright! Let's begin with question one."},
+        ]
+
+        self.questions = [
+            {
+                "prompt": "\"Which of these words best describes the sea-scent?\" a) Pungent b) Briny c) Salty d) Earthy",
+                "correct": 1,
+                "feedback": "*Bounces excitedly* Correct! \"Briny\" is magnificent for describing that salty ocean scent!"
+            },
+            {
+                "prompt": "Question two! \"Which of these flavors is tangy most similar to?\" a) Sour b) Salty c) Sickly Sweet d) Umami",
+                "correct": 0,
+                "feedback": "*Wiggles happily* Yes! Tangy and sour go hand in hand."
+            },
+            {
+                "prompt": "Question three! \"Which of these is flaky?\" a) Croissant b) Pão de Queijo c) Pepperoni Pizza d) A Wooden Plank",
+                "correct": 0,
+                "feedback": "Exactly! Croissants are definitely flaky!"
+            },
+            {
+                "prompt": "Question four! \"Which of these has a pungent odor?\" a) A Snowflake b) A Raw Potato c) Lasagna d) Gorgonzola Cheese",
+                "correct": 3,
+                "feedback": "Yes, that's correct!"
+            },
+            {
+                "prompt": "Question five! \"Which of these can be considered earthy?\" a) French fries and a burger b) A mop and a broom c) Mushrooms and tubers d) Pasta with ground beef",
+                "correct": 2,
+                "feedback": "*Smiles in approval* Wonderful! You're really getting the hang of this!"
+            },
+            {
+                "prompt": "Question six! \"What does 'couch potato' mean?\" a) A potato sitting on the couch b) A person who lies down on the couch all day c) Kids who like couches and potatoes d) None of the options",
+                "correct": 1,
+                "feedback": "That's it! You're doing great!"
+            },
+            {
+                "prompt": "What is the correct scale of \"crunchiness\" from most crunchy to least crunchy? a) Crunchy, Crispy, Flaky b) Crispy, Snowflaky, Crunchy, Oyster c) Crunchy, Flaky, Radiant, Crispy d) Crunchy, Crispy, Flaky, Smiley",
+                "correct": 0,
+                "feedback": "That's... that's correct!!"
+            },
+        ]
+        self.last_question_line = "*Takes a deep, nervous breath* This is the last question."
+
+        self.other = [
+            {"speaker": "player", "text": "The antidote... it's ready!"},
+            {"speaker": "slime",  "text": "*Shields eyes as the vial begins to fizz and glow faintly* Marina?! Are you okay?!"},
+            {"speaker": "slime",  "text": "*Voice slightly muffled as she absorbs the liquid* I'm fine! Just... hold on!"},
+            {"speaker": "slime",  "text": "*The glow fades, revealing her human form once more* ...I— I'm back."},
+            {"speaker": "player", "text": "*Looks down at her own hands, flexing her fingers* Hands. Actual hands!"},
+            {"speaker": "player", "text": "*Stunned* You're... you're really you again."},
+            {"speaker": "slime",  "text": "*Smiles warmly, eyes glistening* Thanks to you. I don't know how to repay this."},
+            {"speaker": "slime",  "text": "Final Points: "},
+        ]
         self.question_n = (23, 25, 27, 29, 31, 33, 36)
         self.marina = False
+        self.build_script()
         self.script_dir = script_dir
         self.points_sfx = pygame.mixer.Sound(self.script_dir / "assets/points_sfx.wav")
         self.points_sfx.set_volume(0.45)
         pygame.mixer.set_reserved(1)
         self.channel_points = pygame.mixer.Channel(0)
         self.displayed_points = 0
-        self.counter_points = 0
-        self.points_delay = 5
         self.wrong_active = False
         self.correct_answers = {23: 1, 25: 0, 27: 0, 29: 3, 31: 2, 33: 1, 36: 0}
         self.wrong_answer = "Darn it, let's try again!"
@@ -108,9 +134,6 @@ class GameScreen:
         self.num_frames_clock = self.clock.n_frames
         self.num_frames_background = self.background.n_frames
         self.num_frames_txtbox = self.txt_box.n_frames
-        self.slime_screens = [11,13,14,16,18,19,21,22,37,39,40,41,44]
-        self.player_screens = [0,1,2,3,4,5,6,8,10,12,15,17,20,38,42]
-        self.unknown_screens = [7,9]
         self.typed_chars = 0.0
         self.talking()
         self.load_textbox()
@@ -172,23 +195,72 @@ class GameScreen:
                 self.frames_background.append(background_frame_surface)
             except EOFError:
                 break
+    def build_script(self):
+        self.texts = []
+        self.speakers = []
+        self.question_n = []
+        self.correct_answers = {}
+        for entry in self.intro:
+            self.texts.append(entry["text"])
+            self.speakers.append(entry["speaker"])
+        questions = list(self.questions)
+        for i, q in enumerate(questions):
+            if i == len(questions) - 1:
+                self.texts.append(self.last_question_line)
+                self.speakers.append("slime")
+            idx = len(self.texts)
+            self.texts.append(q["prompt"])
+            self.speakers.append("slime")
+            self.question_n.append(idx)
+            self.correct_answers[idx] = q["correct"]
 
+            self.texts.append(q["feedback"])
+            self.speakers.append("slime")
+        for entry in self.other:
+            self.texts.append(entry["text"])
+            self.speakers.append(entry["speaker"])
+        self.question_n = tuple(self.question_n) 
     def talking(self):
-        if self.screen_n in self.slime_screens or (self.screen_n >= 23 and self.screen_n <= 37):
-            self.speaker = "slime"
+        self.speaker = self.speakers[self.screen_n]
+        if self.speaker == "slime":
             self.txt_box = Image.open(self.script_dir / "assets/textbox_marina.gif")
-            self.question_active = False
-        elif self.screen_n in self.player_screens:
-            self.speaker = "player"
+        elif self.speaker == "player":
             self.txt_box = Image.open(self.script_dir / "assets/textbox_player.gif")
-            self.question_active = False
-        elif self.screen_n in self.unknown_screens:
-            self.speaker = "unknown"
+        else:
             self.txt_box = Image.open(self.script_dir / "assets/textbox.gif")
-            self.question_active = False
         self.question_active = self.screen_n in self.correct_answers
             
     def handle_event(self, event):
+        def skip_dialog():
+            if self.screen_n == len(self.texts) - 1 and self.displayed_points < self.points:
+                self.displayed_points = self.points
+
+            if self.counter <= 0 and self.question_active == True:
+                self.go_to(self.screen_n + 2)
+            else:
+                if self.wrong_active:
+                    self.wrong_active = False
+                    self.current_text_str = self.texts[self.screen_n]
+                    self.typed_chars = 0.0
+                    self.question_active = True
+                elif self.question_active:
+                    if self.answer_selected == self.correct_answers[self.screen_n]:
+                        self.points += self.counter * 100
+                        self.next_screen()
+                    else:
+                        if self.counter >= 21:
+                            self.counter = self.counter - 20
+                        else:
+                            self.counter = 0
+                        self.wrong_active = True
+                        self.question_active = False
+                        self.current_text_str = self.wrong_answer
+                        self.typed_chars = 0.0
+                else:
+                    if self.typed_chars < len(self.current_text_str):
+                        self.typed_chars = len(self.current_text_str)
+                    else:
+                        self.next_screen()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 return "menu"
@@ -198,29 +270,7 @@ class GameScreen:
                 else:
                     self.debug_mode = False
             if event.key == pygame.K_RETURN:
-                if self.counter <= 0:
-                    self.go_to(self.screen_n + 2)     # o tempo acabou enquanto lia o erro
-                else:
-                    if self.wrong_active:
-                        self.wrong_active = False
-                        self.current_text_str = self.texts[self.screen_n]
-                        self.typed_chars = 0.0
-                        self.question_active = True
-                    elif self.question_active:
-                        if self.answer_selected == self.correct_answers[self.screen_n]:
-                            self.points += self.counter * 100
-                            self.next_screen()
-                        else:
-                            if self.counter >= 21:
-                                self.counter = self.counter - 20
-                            else:
-                                self.counter = 0
-                            self.wrong_active = True
-                            self.question_active = False
-                            self.current_text_str = self.wrong_answer
-                            self.typed_chars = 0.0
-                    else:
-                        self.next_screen()
+                skip_dialog()
             if self.question_active == True and (event.key == pygame.K_s or event.key == pygame.K_DOWN):
                 self.answer_selected += 1
                 if self.answer_selected >= 4:
@@ -229,8 +279,11 @@ class GameScreen:
                 self.answer_selected -= 1
                 if self.answer_selected <= -1:
                     self.answer_selected = 3
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                skip_dialog()
 
-    def update(self):
+    def update(self, dt):
         if self.screen_n >= 41:
             self.marina = True
         if self.screen_n in self.question_n:
@@ -283,19 +336,22 @@ class GameScreen:
         if self.screen_n == len(self.texts) -1:
             if self.displayed_points <= self.points:
                 self.counter_delay_points +=1
-                if self.counter_delay_points >= 3:
-                    self.counter_delay_points = 0  
-                    if self.displayed_points < self.points:
-                        self.displayed_points += int(self.points // 1000)
-                    if self.points_sfx and not pygame.Channel.get_busy(self.channel_points):
-                        if self.displayed_points == self.points and self.coin_extended_active == True:
-                            self.channel_points.play(self.points_sfx, loops= 0,maxtime= 3000)
-                            self.coin_extended_active = False
-                        elif self.displayed_points < self.points:
-                            self.channel_points.play(self.points_sfx, loops= 0, maxtime = 100)
+                if self.displayed_points < self.points:
+                    self.displayed_points += int(self.points // 1000)
+                if self.points_sfx and not pygame.Channel.get_busy(self.channel_points):
+                    if self.displayed_points == self.points and self.coin_extended_active == True:
+                        self.channel_points.play(self.points_sfx, loops= 0,maxtime= 3000)
+                        self.coin_extended_active = False
+                    elif self.displayed_points < self.points:
+                        self.channel_points.play(self.points_sfx, loops= 0, maxtime = 100)
             self.texts[self.screen_n] = f"Final Points: {self.displayed_points}"
             self.current_text_str = f"Final Points: {self.displayed_points}"
             self.typed_chars = len(self.current_text_str)
+        if self.counter > 0 and self.typed_chars >= len(self.current_text_str):
+            self.time_accum += dt
+            while self.time_accum >= 1.0 and self.counter > 0:
+                self.time_accum -= 1.0
+                self.counter -= 1
 
     def draw(self, screen):
         screen.blit(self.frames_background[self.current_frame_background], (0, 0))
@@ -348,19 +404,21 @@ class GameScreen:
                 break
             if remaining >= len(line):
                 line_render = self.font_speech.render(line, True, color=(255, 255, 255))
-                remaining -= len(line)  # SUBTRAI aqui!
+                remaining -= len(line)
             else:
                 line_render = self.font_speech.render(line[:remaining], True, color=(255, 255, 255))
-                remaining = 0  # Não tem mais pra desenhar
+                remaining = 0  
             y = 340 + (i * 35)
             screen.blit(line_render, (20, y))
 
     def reset(self):
+        self.build_script()
         self.typed_chars = 0.0
         self.question_active = False
         self.slime_active = False
         self.screen_n = 0
         self.counter = 60
+        self.time_accum = 0.0
         self.screen_n = 0
         self.typed_chars = 0.0
         self.answer_selected = 0
@@ -388,13 +446,6 @@ class GameScreen:
                 self.frames_textbox.append(txt_box_frame_surface)
             except EOFError:
                 break
-    def next_screen(self):
-        self.counter = 60
-        if self.screen_n + 1 < len(self.texts):
-            self.screen_n += 1
-            self.typed_chars = 0.0
-            self.talking()
-            self.load_textbox()
     def update_music(self):
         n = self.screen_n
         if n < self.question_n[0]:
@@ -409,6 +460,7 @@ class GameScreen:
         self.screen_n = n
         self.typed_chars = 0.0
         self.counter = 60
+        self.time_accum = 0.0
         self.wrong_active = False
         self.answer_selected = 0
         self.current_text_str = self.texts[n]
