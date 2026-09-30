@@ -1,9 +1,11 @@
 import pygame
 from PIL import Image
 import PIL
+import random
 class GameScreen:
     def __init__(self, width, height, script_dir, music):
         self.music = music
+        pygame.mixer.init()
         self.time_accum = 0.0
         self.screen_n = 0
         self.points = 0
@@ -35,42 +37,83 @@ class GameScreen:
         ]
 
         self.questions = [
-            {
-                "prompt": "\"Which of these words best describes the sea-scent?\" a) Pungent b) Briny c) Salty d) Earthy",
-                "correct": 1,
-                "feedback": "*Bounces excitedly* Correct! \"Briny\" is magnificent for describing that salty ocean scent!"
-            },
-            {
-                "prompt": "Question two! \"Which of these flavors is tangy most similar to?\" a) Sour b) Salty c) Sickly Sweet d) Umami",
-                "correct": 0,
-                "feedback": "*Wiggles happily* Yes! Tangy and sour go hand in hand."
-            },
-            {
-                "prompt": "Question three! \"Which of these is flaky?\" a) Croissant b) Pão de Queijo c) Pepperoni Pizza d) A Wooden Plank",
-                "correct": 0,
-                "feedback": "Exactly! Croissants are definitely flaky!"
-            },
-            {
-                "prompt": "Question four! \"Which of these has a pungent odor?\" a) A Snowflake b) A Raw Potato c) Lasagna d) Gorgonzola Cheese",
-                "correct": 3,
-                "feedback": "Yes, that's correct!"
-            },
-            {
-                "prompt": "Question five! \"Which of these can be considered earthy?\" a) French fries and a burger b) A mop and a broom c) Mushrooms and tubers d) Pasta with ground beef",
-                "correct": 2,
-                "feedback": "*Smiles in approval* Wonderful! You're really getting the hang of this!"
-            },
-            {
-                "prompt": "Question six! \"What does 'couch potato' mean?\" a) A potato sitting on the couch b) A person who lies down on the couch all day c) Kids who like couches and potatoes d) None of the options",
-                "correct": 1,
-                "feedback": "That's it! You're doing great!"
-            },
-            {
-                "prompt": "What is the correct scale of \"crunchiness\" from most crunchy to least crunchy? a) Crunchy, Crispy, Flaky b) Crispy, Snowflaky, Crunchy, Oyster c) Crunchy, Flaky, Radiant, Crispy d) Crunchy, Crispy, Flaky, Smiley",
-                "correct": 0,
-                "feedback": "That's... that's correct!!"
-            },
-        ]
+    {
+        "prompt": "\"Which of these words best describes the sea-scent?\" a) Pungent b) Briny c) Salty d) Earthy",
+        "correct": 1,
+        "feedback": "*Bounces excitedly* Correct! \"Briny\" is magnificent for describing that salty ocean scent!"
+    },
+    {
+        "prompt": "\"Which of these flavors is tangy most similar to?\" a) Sour b) Salty c) Sickly Sweet d) Umami",
+        "correct": 0,
+        "feedback": "*Wiggles happily* Yes! Tangy and sour go hand in hand."
+    },
+    {
+        "prompt": "\"Which of these is flaky?\" a) Croissant b) Cheese Bread c) Pepperoni Pizza d) A Wooden Plank",
+        "correct": 0,
+        "feedback": "Exactly! Croissants are definitely flaky!"
+    },
+    {
+        "prompt": "\"Which of these has a pungent odor?\" a) A Snowflake b) A Raw Potato c) Lasagna d) Gorgonzola Cheese",
+        "correct": 3,
+        "feedback": "Yes, that's correct!"
+    },
+    {
+        "prompt": "\"Which of these can be considered earthy?\" a) French fries and a burger b) A mop and a broom c) Mushrooms and tubers d) Pasta with ground beef",
+        "correct": 2,
+        "feedback": "*Smiles in approval* Wonderful! You're really getting the hang of this!"
+    },
+    {
+        "prompt": "\"What does 'couch potato' mean?\" a) A potato sitting on the couch b) A person who lies down on the couch all day c) Kids who like couches and potatoes d) None of the options",
+        "correct": 1,
+        "feedback": "That's it! You're doing great!"
+    },
+    {
+        "prompt": "\"What is the correct scale of crunchiness from most crunchy to least crunchy?\" a) Crunchy, Crispy, Flaky b) Crispy, Snowflaky, Crunchy, Oyster c) Crunchy, Flaky, Radiant, Crispy d) Crunchy, Crispy, Flaky, Smiley",
+        "correct": 0,
+        "feedback": "That's... that's correct!!"
+    },
+    {
+        "prompt": "\"If you're 'in a pickle', what does that mean?\" a) You are extremely happy b) You are in a difficult situation c) You are eating a snack d) You are very hungry",
+        "correct": 1,
+        "feedback": "*Bounces excitedly* Correct! Being 'in a pickle' means being stuck in a tricky situation!"
+    },
+    {
+        "prompt": "\"If a task is a 'piece of cake', it means it is...\" a) Very difficult b) Very sweet c) Very easy d) Very expensive",
+        "correct": 2,
+        "feedback": "*Wiggles happily* Yes! A 'piece of cake' is something incredibly easy to do!"
+    },
+    {
+        "prompt": "\"What does it mean to 'spill the beans'?\" a) To cook dinner b) To reveal a secret c) To make a mess d) To lose your temper",
+        "correct": 1,
+        "feedback": "Exactly! To 'spill the beans' means to accidentally reveal a secret!"
+    },
+    {
+        "prompt": "\"Someone who is 'cool as a cucumber' is...\" a) Very cold b) Very nervous c) Very calm d) Very rude",
+        "correct": 2,
+        "feedback": "Yes, that's correct! Being 'cool as a cucumber' means staying calm under pressure!"
+    },
+    {
+        "prompt": "\"To 'bring home the bacon' means to...\" a) Cook a big meal b) Earn money for your family c) Win a competition d) Arrive late for dinner",
+        "correct": 1,
+        "feedback": "*Smiles in approval* Wonderful! To 'bring home the bacon' means to earn a living for your family!"
+    },
+    {
+        "prompt": "\"If you 'have a lot on your plate', you are...\" a) Very hungry b) Overeating c) Busy with many things d) Planning a big dinner",
+        "correct": 2,
+        "feedback": "That's it! Having 'a lot on your plate' means you're dealing with many responsibilities!"
+    },
+    {
+        "prompt": "\"If something is 'not your cup of tea', it means you...\" a) Don't like it b) Don't drink tea c) Are thirsty d) Are allergic to it",
+        "correct": 0,
+        "feedback": "*Bounces happily* Correct! Saying something is 'not your cup of tea' means it simply isn't to your taste!"
+    },
+    {
+        "prompt": "\"If a product 'sells like hot cakes', it means it is...\" a) Overpriced b) Being sold very quickly c) Being sold at a bakery d) Not popular at all",
+        "correct": 1,
+        "feedback": "*Wiggles excitedly* That's... that's correct!! When something 'sells like hot cakes', it flies off the shelves in no time!"
+    },
+]
+
         self.last_question_line = "*Takes a deep, nervous breath* This is the last question."
 
         self.other = [
@@ -83,7 +126,6 @@ class GameScreen:
             {"speaker": "slime",  "text": "*Smiles warmly, eyes glistening* Thanks to you. I don't know how to repay this."},
             {"speaker": "slime",  "text": "Final Points: "},
         ]
-        self.question_n = (23, 25, 27, 29, 31, 33, 36)
         self.marina = False
         self.build_script()
         self.script_dir = script_dir
@@ -93,7 +135,6 @@ class GameScreen:
         self.channel_points = pygame.mixer.Channel(0)
         self.displayed_points = 0
         self.wrong_active = False
-        self.correct_answers = {23: 1, 25: 0, 27: 0, 29: 3, 31: 2, 33: 1, 36: 0}
         self.wrong_answer = "Darn it, let's try again!"
         self.slime_active = False
         self.font_clock = pygame.font.Font(None, 70)
@@ -196,6 +237,7 @@ class GameScreen:
             except EOFError:
                 break
     def build_script(self):
+        random.shuffle(self.questions)
         self.texts = []
         self.speakers = []
         self.question_n = []
@@ -219,7 +261,10 @@ class GameScreen:
         for entry in self.other:
             self.texts.append(entry["text"])
             self.speakers.append(entry["speaker"])
-        self.question_n = tuple(self.question_n) 
+        self.slime_start_index = next(i for i, e in enumerate(self.intro) if e["speaker"] != "player")
+        self.other_start = len(self.texts) - len(self.other)
+        self.human_reveal_index = self.other_start + 3
+        self.question_n = tuple(self.question_n)
     def talking(self):
         self.speaker = self.speakers[self.screen_n]
         if self.speaker == "slime":
@@ -284,7 +329,7 @@ class GameScreen:
                 skip_dialog()
 
     def update(self, dt):
-        if self.screen_n >= 41:
+        if self.screen_n >= self.human_reveal_index:
             self.marina = True
         if self.screen_n in self.question_n:
             self.question_active = True
@@ -297,7 +342,7 @@ class GameScreen:
                 self.frame_counter_question = 0
                 if self.current_frame_question >= len(self.frames_question[self.answer_selected]):
                     self.current_frame_question = 0
-        if self.screen_n >= 7 and self.screen_n < 41:
+        if self.screen_n >= self.slime_start_index and self.screen_n < self.human_reveal_index:
             self.slime_active = True
         else:
             self.slime_active = False
@@ -452,7 +497,7 @@ class GameScreen:
             self.music.play("intro")
         elif n <= self.question_n[-1] + 1:
             self.music.play("quiz")
-        elif n <= 44:
+        elif n < self.other_start + len(self.other) - 1:
             self.music.play("after")
         else:
             self.music.play("score", loops=-1)
